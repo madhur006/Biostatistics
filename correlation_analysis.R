@@ -34,7 +34,7 @@ round(cor(df), 3)
 
 
 
-# Visualize correlation matrix : sxcorrplot, catterplot, heatmap
+# Visualize correlation matrix : corrplot, scatterplot, heatmap
 
 adv_cor <- cor(df)
 # Positive correlations are displayed in blue and negative correlations in red color
