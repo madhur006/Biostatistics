@@ -4,7 +4,7 @@
 # ANOVA test and
 # Kruskal-Wallis test
 
-# Comparing one-sample mean to a standard known mean : one sampel t-test and one sample wilcoxon test 
+# Comparing one-sample mean to a standard known mean : one sample t-test and one sample wilcoxon test 
 
 # One sample t-test :  used to compare the mean of one sample to a known standard mean (or theoretical/hypothetical) 
 
@@ -153,3 +153,33 @@ plot(res.aov, 2)
 # Non-parametric alternative to one-way ANOVA test
 
 kruskal.test(RestBP ~ ChestPain, data = df_heart)
+
+# MANOVA Test : Multivariate analysis of variance 
+# multiple response variables : test them simultaneously using a multivariate analysis of variance (MANOVA). 
+
+# Assumptions for MANOVA 
+# The dependent variables should be normally distribute within groups. 
+# Homogeneity of variances across the range of predictors.
+# Linearity between all pairs of dependent variables, all pairs of covariates, and all dependent variable-covariate pairs in each cell
+
+bp <- df_heart$RestBP
+cholesterol <-df_heart$Chol
+res.man <- manova(cbind(bp, cholesterol) ~ ChestPain ,data = df_heart)
+summary(res.man)
+summary.aov(res.man)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
