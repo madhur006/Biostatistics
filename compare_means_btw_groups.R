@@ -9,7 +9,7 @@
 # One sample t-test :  used to compare the mean of one sample to a known standard mean (or theoretical/hypothetical) 
 
 # theoretical mean comes from: a previous experiment. For example, compare whether the mean weight of mice differs from 200 mg, a value determined in a previous study.
-#  from an experiment where you have control and treatment conditions. 
+#  from an experiment whsere you have control and treatment conditions. 
 
 # research question 
 # whether the mean (m) of the sample is equal to the theoretical mean (μ)?
