@@ -15,5 +15,19 @@ summary(epi2x2(mymatrix))
 
 
 # chi square test 
-mychi.test<-chisq.test(mymatrix, correct=FALSE)
+df_heart <- read.csv('data/Heart.csv')
+View(df_heart)
+
+## Association between chest pain and AHD
+# Create contingency table
+contingency_table <- table(df_heart$ChestPain, df_heart$AHD)
+contingency_table
+
+# pearson chisq test 
+mychi.test<-chisq.test(contingency_table, correct=FALSE)
 mychi.test
+
+
+# for small sample size - fisher 
+fisher_result <- fisher.test(contingency_table)
+print(fisher_result)
