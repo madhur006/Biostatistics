@@ -1,120 +1,57 @@
-# Time to Event Data
-
-# Time from cancer diagnosis until death 
-# Time from pacemaker implant until battery depletion 
-# Time from starting a quit-smoking program until person resume smoking 
-# Time from kidney transplant to graft loss
-
-
-#  survival package 
-# survminer package for ggplot2-based visualization of survival analysis results
-# Surv() -  create a survival object
-# survfit() - fit survival curves (Kaplan-Meier estimates)
-# survdiff() - perform log-rank test comparing survival curves
-# coxph() - compute the Cox proportional hazards model
-
-# Kaplan-Meier plots : visualize survival curves
-# Log-rank test : compare  survival curves of two or more groups
-# Cox proportional hazards regression : describe the effect of variables on survival. 
-
-# survival probability
-# hazard  
-
-# The Kaplan-Meier (KM) : non-parametric method used to estimate the survival probability from observed survival times
-
 library(survival)
 library(survminer)
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(multcomp)
 
 df_lung <- lung
 
+head(df_lung)
 
-# compute survival curve 
-fit <- survfit(Surv(time, status) ~ sex, data = df_lung)
-print(fit)
-summary(fit)$table
-
-# Visualize survival curves
-
-ggsurvplot(fit, pval = TRUE, conf.int = TRUE, 
-           risk.table = TRUE, risk.table.col = "strata", 
-           surv.median.line = "hv")
+# Compute Survival Curve
+kmsurv <- survfit(Surv(time, status) ~ sex, data = df_lung)
 
 
-# Also, plot  number of censored subjects at time t
-ggsurvplot(fit, pval = TRUE, conf.int = TRUE, 
-           risk.table = TRUE, risk.table.col = "strata", 
-           surv.median.line = "hv", 
-           ncensor.plot = TRUE)
+# Median survival time and its Confidence interval
+kmsurv
 
-# looking for survival probability at particular time 
-# median survival time for both groups : can also get from summary(fit)$table
+# kmsurv
 
-# shorten survival curves 
-
-ggsurvplot(fit, conf.int = TRUE,
-           xlim = c(0, 650))
-
-
-# plot cumulative events or cumulative incidence,
-
-ggsurvplot(fit,
-           conf.int = TRUE,
-           fun = "event")
-
-# cumulative hazard : hazard probability 
-# H(t)=−log(survivalfunction)
-ggsurvplot(fit,
-           conf.int = TRUE,
-           fun = "cumhaz")
+# Visualize Survival Curve 
+autoplot(kmsurv) + 
+  xlab('time in days') + 
+  ylab('survival percent') + 
+  labs(title = 'Survival Curve for Lung Cancer')+
+  theme_bw() + 
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 20),
+    axis.title.x = element_text(size = 16),
+    axis.title.y = element_text(size = 16),
+    axis.text.x = element_text(size = 14), 
+    axis.text.y = element_text(size = 14))
 
 
-# Log-Rank test comparing survival curves :  non-parametric tes
-#  The null hypothesis is that there is no difference in survival between the two groups. 
-# the log rank test compares the observed number of events in each group to what would be expected if the null hypothesis were true
+# Log Rank Test 
+survdiff(Surv(time, status) ~ sex, data = df_lung, rho = 0)
 
-surv_diff <- survdiff(Surv(time, status) ~ sex, data = df_lung)
-surv_diff
+# Survival probability at different time points and its CI
 
-#  p < 0.05, indicating that the sex groups differ significantly in survival.
-
-
-# Cox proportional-hazards model : regression model commonly used statistical in medical research 
-# for investigating the association between the survival time of patients and one or more predictor variables.
-#  Kaplan-Meier curves and logrank tests - are univariate analysis
-
-# Cox proportional hazards regression analysis : quantitative predictor variables and for categorical variables. 
-# Cox regression model extends survival analysis methods to assess simultaneously the effect of several risk factors on survival time.
-
-# A covariate with hazard ratio > 1 (i.e.: b > 0) is called bad prognostic factor
-# A covariate with hazard ratio < 1 (i.e.: b < 0) is called good prognostic factor
-
-# Univariate cox analysis 
-res.cox <- coxph(Surv(time, status) ~ sex, data = df_lung)
-res.cox
-
-summary(res.cox)
-
-
-# Multivariate Cox regression analysis
-
-res.cox <- coxph(Surv(time, status) ~ age + sex + ph.ecog, data =  df_lung)
-summary(res.cox)
-
-# Visualizing the estimated distribution of survival times
-
-surv_fit <- survfit(res.cox, newdata = df_lung) 
-ggsurvplot(survfit(res.cox, df_lung))
-
+summary(kmsurv, times=c(100, 250, 500, 750))
 
 # Proportional Hazard Regression 
-library(survival)
-kmsurv <- survfit(df_lung)
+# Model Cox PH Regression 
 
+model_1 <- coxph(Surv(df_lung$time, df_lung$status) ~ sex, data = df_lung)
+summary(model_1)
 
+# Checking assumption for Cox PH 
+# schoenfeld residuals verses time
+sch.test = cox.zph(model_1)
+ggcoxzph(sch.test)
 
+# Multiple Cox PH Regression 
 
-
-
-
-
+model_2 <- coxph(Surv(time, status) ~ age + sex + ph.ecog, data =  df_lung)
+summary(model_2)
 
